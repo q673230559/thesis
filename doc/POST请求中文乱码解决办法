@@ -1,0 +1,14 @@
+参考 https://zhidao.baidu.com/question/177106978244798884.html
+如下解决办法：
+
+Tomcat 的 conf 下的server.xml文件中将
+<Connector port="8080" protocol="HTTP/1.1" 
+               connectionTimeout="20000" 
+               redirectPort="8443" />
+里添加上后面3个编码的设置
+<Connector port="8080" protocol="HTTP/1.1" 
+                                  connectionTimeout="20000" 
+redirectPort="8443" 
+useBodyEncodingForURI="true"
+IEncoding="utf-8" 
+URIEncoding="utf-8"/>
