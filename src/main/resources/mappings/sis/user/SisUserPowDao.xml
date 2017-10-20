@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.rundeep.sis.user.dao.SisUserPowDao">
+    
+	<sql id="sisUserPowColumns">
+		a.id AS "id",
+		a.sis_user_id AS "sis_user.id",
+		a.power AS "power",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sisUserPowJoins">
+		LEFT JOIN sis_user b ON b.id = a.sis_user_id
+	</sql>
+    
+	<select id="get" resultType="SisUserPow">
+		SELECT 
+			<include refid="sisUserPowColumns"/>
+		FROM sis_user_pow a
+		<include refid="sisUserPowJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SisUserPow">
+		SELECT 
+			<include refid="sisUserPowColumns"/>
+		FROM sis_user_pow a
+		<include refid="sisUserPowJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sis_user != null and sis_user.id != null and sis_user.id != ''">
+				AND a.sis_user_id = #{sis_user.id}
+			</if>
+			<if test="power != null and power != ''">
+				AND a.power = #{power}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SisUserPow">
+		SELECT 
+			<include refid="sisUserPowColumns"/>
+		FROM sis_user_pow a
+		<include refid="sisUserPowJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sis_user_pow(
+			id,
+			sis_user_id,
+			power,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sis_user.id},
+			#{power},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sis_user_pow SET 	
+			power = #{power}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sis_user_pow SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE sis_user_id = #{sis_user.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

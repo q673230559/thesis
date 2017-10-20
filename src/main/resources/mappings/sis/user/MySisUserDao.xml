@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.rundeep.sis.user.dao.MySisUserDao">
+	<sql id="sisUserColumns">
+		a.id AS "id",
+		a.nickname AS "nickname",
+		a.phonenumber AS "phonenumber",
+		a.email AS "email",
+		a.password AS "password",
+		a.degree AS "degree",
+		a.balance AS "balance",
+		a.withdraw_balance AS "withdrawBalance",
+		a.status AS "status",
+		a.head_pic AS "headPic",
+		a.exp AS "exp",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<select id="selectUserByUNamePwd" resultType="SisUser">
+		SELECT 
+			<include refid="sisUserColumns"/>
+		FROM sis_user a
+		WHERE a.del_flag = 0 AND a.phonenumber = #{0} AND a.password = #{1}
+	</select>
+	
+	<select id="selectUsersByPro" resultType="SisUser">
+		SELECT
+			<include refid="sisUserColumns"/>
+		FROM sis_user a , sis_user_pro b
+		WHERE b.del_flag = 0 AND a.del_flag = 0 AND b.pro_field = #{0} AND a.id = b.sis_user_id
+	</select>
+	
+	<select id="selectUsersByMyId" resultType="SisUser">
+		SELECT
+			<include refid="sisUserColumns"/>
+		FROM sis_user a , sis_myfriend b
+		WHERE b.del_flag = 0 AND a.del_flag = 0 AND b.my_id = #{0} AND a.id = b.friend_id 
+	</select>
+
+	<select id="selectUserByMy_idIt_id" resultType="SisUser">
+		SELECT
+			<include refid="sisUserColumns"/>
+		FROM sis_user a , sis_myfriend b
+		WHERE b.del_flag = 0 AND a.del_flag = 0 AND b.my_id = #{0} AND b.friend_id = #{1} AND a.id = b.friend_id
+	</select>
+</mapper>

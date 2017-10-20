@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.rundeep.sis.find.dao.SisFindDao">
+    
+	<sql id="sisFindColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.mod_type AS "modType",
+		a.res_type AS "resType",
+		a.bid_price AS "bidPrice",
+		a.real_price AS "realPrice",
+		a.content AS "content",
+		a.pic_url AS "picUrl",
+		a.vid_url AS "vidUrl",
+		a.status AS "status",
+		a.is_free AS "isFree",
+		a.is_hot AS "isHot",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.sort AS "sort"
+	</sql>
+	
+	<sql id="sisFindJoins">
+	</sql>
+    
+	<select id="get" resultType="SisFind">
+		SELECT 
+			<include refid="sisFindColumns"/>
+		FROM sis_find a
+		<include refid="sisFindJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SisFind">
+		SELECT 
+			<include refid="sisFindColumns"/>
+		FROM sis_find a
+		<include refid="sisFindJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="modType != null and modType != ''">
+				AND a.mod_type = #{modType}
+			</if>
+			<if test="resType != null and resType != ''">
+				AND a.res_type = #{resType}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="isFree != null and isFree != ''">
+				AND a.is_free = #{isFree}
+			</if>
+			<if test="isHot != null and isHot != ''">
+				AND a.is_hot = #{isHot}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="delFlag != null and delFlag != ''">
+				AND a.del_flag = #{delFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SisFind">
+		SELECT 
+			<include refid="sisFindColumns"/>
+		FROM sis_find a
+		<include refid="sisFindJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sis_find(
+			id,
+			title,
+			mod_type,
+			res_type,
+			bid_price,
+			real_price,
+			content,
+			pic_url,
+			vid_url,
+			status,
+			is_free,
+			is_hot,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			sort
+		) VALUES (
+			#{id},
+			#{title},
+			#{modType},
+			#{resType},
+			#{bidPrice},
+			#{realPrice},
+			#{content},
+			#{picUrl},
+			#{vidUrl},
+			#{status},
+			#{isFree},
+			#{isHot},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{sort}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sis_find SET 	
+			title = #{title},
+			mod_type = #{modType},
+			res_type = #{resType},
+			bid_price = #{bidPrice},
+			real_price = #{realPrice},
+			content = #{content},
+			pic_url = #{picUrl},
+			vid_url = #{vidUrl},
+			status = #{status},
+			is_free = #{isFree},
+			is_hot = #{isHot},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			remarks = #{remarks},
+			sort = #{sort}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sis_find SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

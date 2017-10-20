@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.rundeep.sis.find.dao.SisFindAddDao">
+    
+	<sql id="sisFindAddColumns">
+		a.id AS "id",
+		a.find_id AS "sis_find.id",
+		a.res_title AS "resTitle",
+		a.res_add_type AS "resAddType",
+		a.res_url AS "resUrl",
+		a.pic_url AS "picUrl",
+		a.res_content AS "resContent",
+		a.res_status AS "resStatus",
+		a.res_sort AS "resSort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sisFindAddJoins">
+		LEFT JOIN sis_find b ON b.id = a.find_id
+	</sql>
+    
+	<select id="get" resultType="SisFindAdd">
+		SELECT 
+			<include refid="sisFindAddColumns"/>
+		FROM sis_find_add a
+		<include refid="sisFindAddJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SisFindAdd">
+		SELECT 
+			<include refid="sisFindAddColumns"/>
+		FROM sis_find_add a
+		<include refid="sisFindAddJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sis_find != null and sis_find.id != null and sis_find.id != ''">
+				AND a.find_id = #{sis_find.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SisFindAdd">
+		SELECT 
+			<include refid="sisFindAddColumns"/>
+		FROM sis_find_add a
+		<include refid="sisFindAddJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sis_find_add(
+			res_title,
+			res_add_type,
+			res_url,
+			pic_url,
+			res_content,
+			res_status,
+			res_sort,
+			create_by,
+			create_date,
+			remarks
+		) VALUES (
+			#{resTitle},
+			#{resAddType},
+			#{resUrl},
+			#{picUrl},
+			#{resContent},
+			#{resStatus},
+			#{resSort},
+			#{createBy.id},
+			#{createDate},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sis_find_add SET 	
+			res_title = #{resTitle},
+			res_add_type = #{resAddType},
+			res_url = #{resUrl},
+			pic_url = #{picUrl},
+			res_content = #{resContent},
+			res_status = #{resStatus},
+			res_sort = #{resSort},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sis_find_add SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE find_id = #{sis_find.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

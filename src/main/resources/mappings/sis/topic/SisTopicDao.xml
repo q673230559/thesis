@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.rundeep.sis.topic.dao.SisTopicDao">
+    
+	<sql id="sisTopicColumns">
+		a.id AS "id",
+		a.keyword AS "keyword",
+		a.publisher AS "publisher",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.bid_price AS "bidPrice",
+		a.real_price AS "realPrice",
+		a.user_id AS "sisUserId",
+		a.status AS "status",
+		a.sort AS "sort",
+		a.hot_sort AS "hotSort",
+		a.flow_status AS "flowStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sisTopicJoins">
+	</sql>
+    
+	<select id="get" resultType="SisTopic">
+		SELECT 
+			<include refid="sisTopicColumns"/>
+		FROM sis_topic a
+		<include refid="sisTopicJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SisTopic">
+		SELECT 
+			<include refid="sisTopicColumns"/>
+		FROM sis_topic a
+		<include refid="sisTopicJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="keyword != null and keyword != ''">
+				AND a.keyword LIKE 
+					<if test="dbName == 'oracle'">'%'||#{keyword}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{keyword}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{keyword},'%')</if>
+			</if>
+			<if test="publisher != null and publisher != ''">
+				AND a.publisher = #{publisher}
+			</if>
+			<if test="sisUserId != null and sisUserId != ''">
+				AND a.user_id = #{sisUserId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SisTopic">
+		SELECT 
+			<include refid="sisTopicColumns"/>
+		FROM sis_topic a
+		<include refid="sisTopicJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sis_topic(
+			id,
+			keyword,
+			publisher,
+			start_time,
+			end_time,
+			bid_price,
+			real_price,
+			user_id,
+			status,
+			sort,
+			hot_sort,
+			flow_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{keyword},
+			#{publisher},
+			#{startTime},
+			#{endTime},
+			#{bidPrice},
+			#{realPrice},
+			#{sisUserId},
+			#{status},
+			#{sort},
+			#{hotSort},
+			#{flowStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sis_topic SET 	
+			keyword = #{keyword},
+			publisher = #{publisher},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			bid_price = #{bidPrice},
+			real_price = #{realPrice},
+			user_id = #{sisUserId},
+			status = #{status},
+			sort = #{sort},
+			hot_sort = #{hotSort},
+			flow_status = #{flowStatus},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sis_topic SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
